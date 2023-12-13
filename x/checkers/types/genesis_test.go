@@ -7,8 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+
 func TestGenesisState_Validate(t *testing.T) {
-	tests := []struct {
+	for _, tc := range []struct {
 		desc     string
 		genState *types.GenesisState
 		valid    bool
@@ -22,8 +23,8 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
 
-				SystemInfo: &types.SystemInfo{
-					NextId: 24,
+				SystemInfo: types.SystemInfo{
+					NextId: 39,
 				},
 				StoredGameList: []types.StoredGame{
 					{
@@ -52,8 +53,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		// this line is used by starport scaffolding # types/genesis/testcase
-	}
-	for _, tc := range tests {
+	} {
 		t.Run(tc.desc, func(t *testing.T) {
 			err := tc.genState.Validate()
 			if tc.valid {
@@ -63,4 +63,17 @@ func TestGenesisState_Validate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestDefaultGenesisState_ExpectedInitialNextId(t *testing.T) {
+	require.EqualValues(t,
+		&types.GenesisState{
+			StoredGameList: []types.StoredGame{},
+			SystemInfo: types.SystemInfo{
+				NextId:        uint64(1),
+				FifoHeadIndex: "-1",
+				FifoTailIndex: "-1",
+			},
+		},
+		types.DefaultGenesis())
 }

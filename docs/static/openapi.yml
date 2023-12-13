@@ -42,6 +42,7 @@ paths:
         - Query
   /gicho909/checkers/checkers/stored_game:
     get:
+      summary: Queries a list of StoredGame items.
       operationId: CheckersCheckersStoredGameAll
       responses:
         '200':
@@ -63,6 +64,17 @@ paths:
                     black:
                       type: string
                     red:
+                      type: string
+                    winner:
+                      type: string
+                    deadline:
+                      type: string
+                    moveCount:
+                      type: string
+                      format: uint64
+                    beforeIndex:
+                      type: string
+                    afterIndex:
                       type: string
               pagination:
                 type: object
@@ -171,7 +183,7 @@ paths:
         - Query
   /gicho909/checkers/checkers/stored_game/{index}:
     get:
-      summary: Queries a list of StoredGame items.
+      summary: Queries a StoredGame by index.
       operationId: CheckersCheckersStoredGame
       responses:
         '200':
@@ -191,6 +203,17 @@ paths:
                   black:
                     type: string
                   red:
+                    type: string
+                  winner:
+                    type: string
+                  deadline:
+                    type: string
+                  moveCount:
+                    type: string
+                    format: uint64
+                  beforeIndex:
+                    type: string
+                  afterIndex:
                     type: string
         default:
           description: An unexpected error response.
@@ -233,6 +256,10 @@ paths:
                   nextId:
                     type: string
                     format: uint64
+                  fifoHeadIndex:
+                    type: string
+                  fifoTailIndex:
+                    type: string
         default:
           description: An unexpected error response.
           schema:
@@ -46694,6 +46721,17 @@ definitions:
         type: string
   checkers.checkers.MsgCreatePostResponse:
     type: object
+  checkers.checkers.MsgPlayMoveResponse:
+    type: object
+    properties:
+      capturedX:
+        type: integer
+        format: int32
+      capturedY:
+        type: integer
+        format: int32
+      winner:
+        type: string
   checkers.checkers.Params:
     type: object
     description: Params defines the parameters for the module.
@@ -46714,6 +46752,17 @@ definitions:
             black:
               type: string
             red:
+              type: string
+            winner:
+              type: string
+            deadline:
+              type: string
+            moveCount:
+              type: string
+              format: uint64
+            beforeIndex:
+              type: string
+            afterIndex:
               type: string
       pagination:
         type: object
@@ -46757,6 +46806,17 @@ definitions:
             type: string
           red:
             type: string
+          winner:
+            type: string
+          deadline:
+            type: string
+          moveCount:
+            type: string
+            format: uint64
+          beforeIndex:
+            type: string
+          afterIndex:
+            type: string
   checkers.checkers.QueryGetSystemInfoResponse:
     type: object
     properties:
@@ -46766,6 +46826,10 @@ definitions:
           nextId:
             type: string
             format: uint64
+          fifoHeadIndex:
+            type: string
+          fifoTailIndex:
+            type: string
   checkers.checkers.QueryParamsResponse:
     type: object
     properties:
@@ -46786,12 +46850,27 @@ definitions:
         type: string
       red:
         type: string
+      winner:
+        type: string
+      deadline:
+        type: string
+      moveCount:
+        type: string
+        format: uint64
+      beforeIndex:
+        type: string
+      afterIndex:
+        type: string
   checkers.checkers.SystemInfo:
     type: object
     properties:
       nextId:
         type: string
         format: uint64
+      fifoHeadIndex:
+        type: string
+      fifoTailIndex:
+        type: string
   cosmos.base.query.v1beta1.PageRequest:
     type: object
     properties:
