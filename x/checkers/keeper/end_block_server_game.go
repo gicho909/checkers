@@ -9,7 +9,6 @@ import (
 	"github.com/gicho909/checkers/x/checkers/types"
 )
 
-
 func (k Keeper) ForfeitExpiredGames(goCtx context.Context) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

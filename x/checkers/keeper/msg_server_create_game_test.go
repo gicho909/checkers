@@ -8,14 +8,27 @@ import (
 	keepertest "github.com/gicho909/checkers/testutil/keeper"
 	"github.com/gicho909/checkers/x/checkers"
 	"github.com/gicho909/checkers/x/checkers/keeper"
+	"github.com/gicho909/checkers/x/checkers/testutil"
 	"github.com/gicho909/checkers/x/checkers/types"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
 
 func setupMsgServerCreateGame(t testing.TB) (types.MsgServer, keeper.Keeper, context.Context) {
-	k, ctx := keepertest.CheckersKeeper(t)
+	server, k, context, _, escrow := setupMsgServerCreateGameWithMock(t)
+	escrow.ExpectAny(context)
+	return server, k, context
+}
+
+func setupMsgServerCreateGameWithMock(t testing.TB) (types.MsgServer, keeper.Keeper, context.Context,
+	*gomock.Controller, *testutil.MockBankEscrowKeeper) {
+	ctrl := gomock.NewController(t)
+	bankMock := testutil.NewMockBankEscrowKeeper(ctrl)
+	k, ctx := keepertest.CheckersKeeperWithMocks(t, bankMock)
 	checkers.InitGenesis(ctx, *k, *types.DefaultGenesis())
-	return keeper.NewMsgServerImpl(*k), *k, sdk.WrapSDKContext(ctx)
+	server := keeper.NewMsgServerImpl(*k)
+	context := sdk.WrapSDKContext(ctx)
+	return server, *k, context, ctrl, bankMock
 }
 
 func TestCreateGame(t *testing.T) {
@@ -114,6 +127,20 @@ func TestCreate1GameEmitted(t *testing.T) {
 			{Key: "wager", Value: "45"},
 		},
 	}, event)
+}
+
+func TestCreate1GameConsumedGas(t *testing.T) {
+	msgSrvr, _, context := setupMsgServerCreateGame(t)
+	ctx := sdk.UnwrapSDKContext(context)
+	before := ctx.GasMeter().GasConsumed()
+	msgSrvr.CreateGame(context, &types.MsgCreateGame{
+		Creator: alice,
+		Black:   bob,
+		Red:     carol,
+		Wager:   45,
+	})
+	after := ctx.GasMeter().GasConsumed()
+	require.GreaterOrEqual(t, after, before+25_000)
 }
 
 func TestCreateGameRedAddressBad(t *testing.T) {

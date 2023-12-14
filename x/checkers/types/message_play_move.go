@@ -7,6 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gicho909/checkers/x/checkers/rules"
 )
+
 const TypeMsgPlayMove = "play_move"
 
 var _ sdk.Msg = &MsgPlayMove{}
