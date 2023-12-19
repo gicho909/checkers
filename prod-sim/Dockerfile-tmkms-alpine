@@ -1,7 +1,7 @@
-FROM --platform=linux rust:1.64.0 AS builder
+FROM --platform=linux rust:1.64.0-alpine AS builder
 
-RUN apt-get update
-RUN apt-get install libusb-1.0-0-dev --yes
+RUN apk update
+RUN apk add libusb-dev=1.0.26-r0 musl-dev git
 
 ENV LOCAL=/usr/local
 ENV RUSTFLAGS=-Ctarget-feature=+aes,+ssse3
@@ -12,7 +12,7 @@ RUN git clone --branch ${TMKMS_VERSION} https://github.com/iqlusioninc/tmkms.git
 WORKDIR /root/tmkms
 RUN cargo build --release --features=softsign
 
-FROM --platform=linux debian:11-slim
+FROM --platform=linux alpine
 
 COPY --from=builder /root/tmkms/target/release/tmkms ${LOCAL}/bin
 

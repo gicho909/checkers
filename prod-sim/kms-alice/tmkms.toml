@@ -24,6 +24,6 @@ path = "/root/tmkms/secrets/val-alice-consensus.key"
 chain_id = "checkers-1"
 addr = "tcp://val-alice:26659"
 secret_key = "/root/tmkms/secrets/kms-identity.key"
-protocol_version = "legacy"
+protocol_version = "v0.34"
 reconnect = true
 

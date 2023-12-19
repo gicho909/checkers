@@ -96,7 +96,7 @@ laddr = "tcp://0.0.0.0:26657"
 # A list of origins a cross-domain request can be executed from
 # Default value '[]' disables cors support
 # Use '["*"]' to allow any origin
-cors_allowed_origins = [*]
+cors_allowed_origins = ["*"]
 
 # A list of methods the client is allowed to use with cross-domain requests
 cors_allowed_methods = ["HEAD", "GET", "POST", ]
@@ -212,7 +212,7 @@ laddr = "tcp://0.0.0.0:26656"
 external_address = ""
 
 # Comma separated list of seed nodes to connect to
-seeds = "c00d4955838b09ec13a39b39765ca075bd5e0d6a@sentry-alice:26656,62ec0cce546bf4a573337a0994e09c8ffc8205dc@sentry-bob:26656"
+seeds = "5619da140b5367b5d82b7c3809c41ad0a1918fae@sentry-alice:26656,58d640551bbf405ef9eac2f554db5222d2035e9d@sentry-bob:26656"
 
 
 # Comma separated list of nodes to keep persistent connections to
