@@ -114,6 +114,9 @@ import (
 	checkersmodulekeeper "github.com/gicho909/checkers/x/checkers/keeper"
 	checkersmoduletypes "github.com/gicho909/checkers/x/checkers/types"
 
+	leaderboardmodule "github.com/gicho909/checkers/x/leaderboard"
+	leaderboardmodulekeeper "github.com/gicho909/checkers/x/leaderboard/keeper"
+	leaderboardmoduletypes "github.com/gicho909/checkers/x/leaderboard/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/gicho909/checkers/app/params"
@@ -122,36 +125,36 @@ import (
 )
 
 func (app *App) setupUpgradeHandlers() {
-    // v1 to v1.1 upgrade handler
-    app.UpgradeKeeper.SetUpgradeHandler(
-        v1tov1_1.UpgradeName,
-        func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-            return app.mm.RunMigrations(ctx, app.configurator, vm)
-        },
-    )
+	// v1 to v1.1 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v1tov1_1.UpgradeName,
+		func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+			return app.mm.RunMigrations(ctx, app.configurator, vm)
+		},
+	)
 
-    // When a planned update height is reached, the old binary will panic
-    // writing on disk the height and name of the update that triggered it
-    // This will read that value, and execute the preparations for the upgrade.
-    upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-    if err != nil {
-        panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
-    }
+	// When a planned update height is reached, the old binary will panic
+	// writing on disk the height and name of the update that triggered it
+	// This will read that value, and execute the preparations for the upgrade.
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
+	}
 
-    if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-        return
-    }
+	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		return
+	}
 
-    var storeUpgrades *storetypes.StoreUpgrades
+	var storeUpgrades *storetypes.StoreUpgrades
 
-    switch upgradeInfo.Name {
-    case v1tov1_1.UpgradeName:
-    }
+	switch upgradeInfo.Name {
+	case v1tov1_1.UpgradeName:
+	}
 
-    if storeUpgrades != nil {
-        // configure store loader that checks if version == upgradeHeight and applies store upgrades
-        app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
-    }
+	if storeUpgrades != nil {
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
+	}
 }
 
 const (
@@ -209,6 +212,7 @@ var (
 		vesting.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		checkersmodule.AppModuleBasic{},
+		leaderboardmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -286,6 +290,8 @@ type App struct {
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
 	CheckersKeeper checkersmodulekeeper.Keeper
+
+	LeaderboardKeeper leaderboardmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -333,6 +339,7 @@ func New(
 		feegrant.StoreKey, evidencetypes.StoreKey, ibctransfertypes.StoreKey, icahosttypes.StoreKey,
 		capabilitytypes.StoreKey, group.StoreKey, icacontrollertypes.StoreKey, consensusparamtypes.StoreKey,
 		checkersmoduletypes.StoreKey,
+		leaderboardmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -564,6 +571,14 @@ func New(
 	)
 	checkersModule := checkersmodule.NewAppModule(appCodec, app.CheckersKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.LeaderboardKeeper = *leaderboardmodulekeeper.NewKeeper(
+		appCodec,
+		keys[leaderboardmoduletypes.StoreKey],
+		keys[leaderboardmoduletypes.MemStoreKey],
+		app.GetSubspace(leaderboardmoduletypes.ModuleName),
+	)
+	leaderboardModule := leaderboardmodule.NewAppModule(appCodec, app.LeaderboardKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -626,6 +641,7 @@ func New(
 		transferModule,
 		icaModule,
 		checkersModule,
+		leaderboardModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -659,6 +675,7 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		checkersmoduletypes.ModuleName,
+		leaderboardmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -685,6 +702,7 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		checkersmoduletypes.ModuleName,
+		leaderboardmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -716,6 +734,7 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		checkersmoduletypes.ModuleName,
+		leaderboardmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -943,6 +962,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(checkersmoduletypes.ModuleName)
+	paramsKeeper.Subspace(leaderboardmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
