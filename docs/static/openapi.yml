@@ -150,10 +150,9 @@ paths:
                   next_key:
                     type: string
                     format: byte
-                    description: |-
+                    title: |-
                       next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently. It will be empty if
-                      there are no more results.
+                      query the next page most efficiently
                   total:
                     type: string
                     format: uint64
@@ -46792,6 +46791,8 @@ definitions:
     properties:
       gameIndex:
         type: string
+  checkers.checkers.MsgCreatePostResponse:
+    type: object
   checkers.checkers.MsgPlayMoveResponse:
     type: object
     properties:
@@ -46846,10 +46847,9 @@ definitions:
           next_key:
             type: string
             format: byte
-            description: |-
+            title: |-
               next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently. It will be empty if
-              there are no more results.
+              query the next page most efficiently
           total:
             type: string
             format: uint64
@@ -47023,6 +47023,9 @@ definitions:
       next_key:
         type: string
         format: byte
+        title: |-
+          next_key is the key to be passed to PageRequest.key to
+          query the next page most efficiently
         description: |-
           next_key is the key to be passed to PageRequest.key to
           query the next page most efficiently. It will be empty if
